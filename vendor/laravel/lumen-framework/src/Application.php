@@ -144,6 +144,8 @@ class Application extends Container
 
     public function any($requested_val)
     {
+        $DEBUG=false; # Set to true to enable debug messages
+
         # NOTE: requested_val needs to come from the URL request IE:
         #       http://127.0.0.1/cco:agent_in
         $curr_dir    = getcwd();
@@ -152,20 +154,32 @@ class Application extends Container
         #             avatar-cco-files/
 
         $update_result = $this->update_cco();
-#        echo "$update_result</br>";
+        if ( $DEBUG !== false) {
+            echo "$update_result</br>";
+        }
 
         if ($handle = opendir("$target_dir")) {
-
-            /* if we didn't find CCO in first line then check all files contents */
             while (false !== ($file = readdir($handle))) {
                 if ('.' === $file) continue;
                 if ('..' === $file) continue;
                 $curr_file  = "$target_dir/$file";
+
+                if ($DEBUG !== false) {
+                    echo "Checking FILE: $curr_file</br>";
+                }
+
                 $fileStream = fopen($curr_file, "r");
                 if ( $fileStream ) {
                     while ( !feof( $fileStream ) ) {
                         $line = fgets($fileStream);
+                        if ($DEBUG !== false) {
+                            echo "line contents ----> \"$line\"</br>";
+                        }
                         if (strpos($line, $requested_val) !== false) {
+                            if ($DEBUG !== false) {
+                                echo "Found a match to \"$requested_val\" in this line:</br>";
+                                echo "START: line ----> $line  ... END";
+                            }
                             $whole_file = file_get_contents($curr_file);
                             echo "<html><div class=\"container\"><pre>";
                             echo "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">";
