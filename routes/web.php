@@ -21,7 +21,10 @@ $router->get('/', function () use ($router) {
 
 $router->get('/{any:.*}', function ($any) use ($router) {
 
-    $DEBUG = false; # Set to true to enable debugging messages
+    $DEBUG  = false; # Set to true to enable debugging messages
+    $output = "NOTHING";
+    $ret    = 0;
+
     if($DEBUG !== false) {
         echo "KH DEBUG: Route is ---------------> " . $any . "</br>";
     }
@@ -40,16 +43,24 @@ $router->get('/{any:.*}', function ($any) use ($router) {
         if ($DEBUG !== false) {
             echo "KH DEBUG: search_term_final ------> $search_term_final</br>";
             echo "KH DEBUG: file_extension ---------> $file_extension</br>";
-	    echo "KH DEBUG: Triggered file extension search</br>";
+        echo "KH DEBUG: Triggered file extension search</br>";
         }
 
-        return $router->app->any_extension($search_term_final);
+        $ret = $router->app->search_firstline_extension($search_term_final, $output);
+        if ($ret !== 1) {
+            $ret = $router->app->search_whole_file_extension($search_term_final, $output);
+        }
     } else {
         // not explodable
         if ($DEBUG !== false) {
-	    echo "KH DEBUG: Triggered normal search</br>";
+            echo "KH DEBUG: Triggered normal search</br>";
         }
-        return $router->app->any($search_term);
+        $ret = $router->app->search_firstline($search_term, $output);
+        if ($ret !== 1) {
+            $ret = $router->app->search_whole_file($search_term, $output);
+        }
     }
+
+    return "$output";
 
 });

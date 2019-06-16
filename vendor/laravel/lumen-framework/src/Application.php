@@ -142,9 +142,10 @@ class Application extends Container
 #        return 'Lumen (5.8.4) (Laravel Components 5.8.*)';
     }
 
-    public function any($requested_val)
+    public function search_firstline($requested_val, &$output)
     {
-        $DEBUG=false; # Set to true to enable debug messages
+//        $DEBUG = true;
+        $DEBUG = false;
 
         # NOTE: requested_val needs to come from the URL request IE:
         #       http://127.0.0.1/cco:agent_in
@@ -153,9 +154,80 @@ class Application extends Container
         # NOTE: TODO: Add loop to update curr_file, parse all files in directory
         #             avatar-cco-files/
 
-        $update_result = $this->update_cco();
         if ( $DEBUG !== false) {
-            echo "$update_result</br>";
+            echo "ENTER: search_firstline</br>";
+        }
+
+        if ($handle = opendir("$target_dir")) {
+            while (false !== ($file = readdir($handle))) {
+                if ('.' === $file) continue;
+                if ('..' === $file) continue;
+                $curr_file  = "$target_dir/$file";
+
+                if ($DEBUG !== false) {
+                    echo "Checking FILE: $curr_file</br>";
+                }
+
+                $fileStream = fopen($curr_file, "r");
+                if ( $fileStream ) {
+                    $line = fgets($fileStream);
+                    if ($DEBUG !== false) {
+                        echo "line contents ----> \"$line\"</br>";
+                    }
+                    if (strpos($line, $requested_val) !== false) {
+                        if ($DEBUG !== false) {
+                            echo "Found a match to \"$requested_val\" in this line:</br>";
+                            echo "START: line ----> $line  ... END";
+                        }
+                        $whole_file = file_get_contents($curr_file);
+                        $output = "<html><div class=\"container\"><pre>";
+                        $output .= "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">";
+                        $whole_file = str_replace("<", "&lt", $whole_file, $i);
+                        $whole_file = str_replace(">", "&gt", $whole_file, $i);
+                        $output .= $whole_file;
+                        $output .= "</meta>";
+                        $output .= "</pre></div></html>";
+                        if ( $DEBUG !== false) {
+                            echo "LEAVE: search_firstline, SUCCESS</br>";
+                        }
+                        return 1;
+                    }
+                    fclose($fileStream);
+                } else {
+                    $output = "Failed to open file $curr_file";
+                    if ( $DEBUG !== false) {
+                        echo "LEAVE: search_firstline, FAIL</br>";
+                    }
+                    return 0;
+                } /* end if fileStream sanity check */
+            } /* end while second search file loop */
+
+        } /* end if openDir sanity check */
+
+        closedir($handle);
+
+        $output = "<html><HTTP/1.0 404 Not Found>ERROR: CCO \"$requested_val\" Not Found</br></html>";
+        if ( $DEBUG !== false) {
+            echo "LEAVE: search_firstline, FAIL</br>";
+        }
+
+        return 0;
+    }
+
+    public function search_whole_file($requested_val, &$output)
+    {
+//        $DEBUG = true;
+        $DEBUG = false;
+
+        # NOTE: requested_val needs to come from the URL request IE:
+        #       http://127.0.0.1/cco:agent_in
+        $curr_dir    = getcwd();
+        $target_dir  = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
+        # NOTE: TODO: Add loop to update curr_file, parse all files in directory
+        #             avatar-cco-files/
+
+        if ( $DEBUG !== false) {
+            echo "ENTER: search_whole_file</br>";
         }
 
         if ($handle = opendir("$target_dir")) {
@@ -181,30 +253,44 @@ class Application extends Container
                                 echo "START: line ----> $line  ... END";
                             }
                             $whole_file = file_get_contents($curr_file);
-                            echo "<html><div class=\"container\"><pre>";
-                            echo "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">";
+                            $output = "<html><div class=\"container\"><pre>";
+                            $output .= "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">";
                             $whole_file = str_replace("<", "&lt", $whole_file, $i);
                             $whole_file = str_replace(">", "&gt", $whole_file, $i);
-                            echo $whole_file;
-                            echo "</meta>";
-                            return "</pre></div></html>";
+                            $output .= $whole_file;
+                            $output .= "</meta>";
+                            $output .= "</pre></div></html>";
+                            if ( $DEBUG !== false) {
+                                echo "LEAVE: search_whole_file, SUCCESS</br>";
+                            }
+                            return 1;
                         }
                     } /* end while !feof(fileStream) */
                     fclose($fileStream);
                 } else {
-                    return "Failed to open file $curr_file";
+                    $output = "Failed to open file $curr_file";
+                    if ( $DEBUG !== false) {
+                        echo "LEAVE: search_whole_file, FAIL</br>";
+                    }
+                    return 0;
                 } /* end if fileStream sanity check */
             } /* end while second search file loop */
-
         } /* end if openDir sanity check */
 
         closedir($handle);
 
-        return "<HTTP/1.0 404 Not Found>ERROR: CCO \"$requested_val\" Not Found";
+        $output = "<html><HTTP/1.0 404 Not Found>ERROR: CCO \"$requested_val\" Not Found</br></html>";
+        if ( $DEBUG !== false) {
+            echo "LEAVE: search_whole_file, FAIL</br>";
+        }
+        return 0;
     }
 
-    public function any_extension($requested_val)
+    public function search_firstline_extension($requested_val, &$output)
     {
+//        $DEBUG = true;
+        $DEBUG = false;
+
         # NOTE: requested_val needs to come from the URL request IE:
         #       http://127.0.0.1/cco:agent_in
         $curr_dir    = getcwd();
@@ -212,8 +298,64 @@ class Application extends Container
         # NOTE: TODO: Add loop to update curr_file, parse all files in directory
         #             avatar-cco-files/
 
-        $update_result = $this->update_cco();
-#        echo "$update_result</br>";
+        if ( $DEBUG !== false) {
+            echo "ENTER: search_firstline_extension</br>";
+        }
+
+        if ($handle = opendir("$target_dir")) {
+
+            /* if we didn't find CCO in first line then check all files contents */
+            while (false !== ($file = readdir($handle))) {
+                if ('.' === $file) continue;
+                if ('..' === $file) continue;
+                $curr_file  = "$target_dir/$file";
+                $fileStream = fopen($curr_file, "r");
+                if ( $fileStream ) {
+                    $line = fgets($fileStream);
+                    if (strpos($line, $requested_val) !== false) {
+                        $whole_file = file_get_contents($curr_file);
+                        $whole_file = str_replace("<", "&lt", $whole_file, $i);
+                        $whole_file = str_replace(">", "&gt", $whole_file, $i);
+                        $output = $whole_file;
+                        if ( $DEBUG !== false) {
+                            echo "LEAVE: search_firstline_extension, SUCCESS</br>";
+                        }
+                        return 1;
+                    }
+                    fclose($fileStream);
+                } else {
+                    $output = "Failed to open file $curr_file";
+                    if ( $DEBUG !== false) {
+                        echo "LEAVE: search_firstline_extension, FAIL</br>";
+                    }
+                    return 0;
+                } /* end if fileStream sanity check */
+            } /* end while second search file loop */
+        } /* end if openDir sanity check */
+
+        closedir($handle);
+
+        $output = "<html><HTTP/1.0 404 Not Found>ERROR: CCO \"$requested_val\" Not Found</br></html>";
+        if ( $DEBUG !== false) {
+            echo "LEAVE: search_firstline_extension, FAIL</br>";
+        }
+        return 0;
+    }
+
+    public function search_whole_file_extension($requested_val, &$output)
+    {
+//        $DEBUG = true;
+        $DEBUG = false;
+
+        # NOTE: requested_val needs to come from the URL request IE:
+        #       http://127.0.0.1/cco:agent_in
+        $curr_dir    = getcwd();
+        $target_dir  = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
+        # NOTE: TODO: Add loop to update curr_file, parse all files in directory
+        #             avatar-cco-files/
+        if ( $DEBUG !== false) {
+            echo "ENTER: search_whole_file_extension</br>";
+        }
 
         if ($handle = opendir("$target_dir")) {
 
@@ -230,12 +372,20 @@ class Application extends Container
                             $whole_file = file_get_contents($curr_file);
                             $whole_file = str_replace("<", "&lt", $whole_file, $i);
                             $whole_file = str_replace(">", "&gt", $whole_file, $i);
-                            return $whole_file;
+                            $output = $whole_file;
+                            if ( $DEBUG !== false) {
+                                echo "LEAVE: search_whole_file_extension, SUCCESS</br>";
+                            }
+                            return 1;
                         }
                     } /* end while !feof(fileStream) */
                     fclose($fileStream);
                 } else {
-                    return "Failed to open file $curr_file";
+                    $output = "Failed to open file $curr_file";
+                    if ( $DEBUG !== false) {
+                        echo "LEAVE: search_whole_file_extension, FAIL</br>";
+                    }
+                    return 0;
                 } /* end if fileStream sanity check */
             } /* end while second search file loop */
 
@@ -243,22 +393,23 @@ class Application extends Container
 
         closedir($handle);
 
-        return "<HTTP/1.0 404 Not Found>ERROR: CCO \"$requested_val\" Not Found";
+        $output = "<html><HTTP/1.0 404 Not Found>ERROR: CCO \"$requested_val\" Not Found</br></html>";
+        if ( $DEBUG !== false) {
+            echo "LEAVE: search_whole_file_extension, FAIL</br>";
+        }
+        return 0;
     }
+
+
     /* A function to update the downloaded files, call with $this->dlcco
      * from inside the class
      */
     public function update_cco()
     {
-#        echo posix_getpwuid(posix_geteuid())['name'];
-#        echo "</br>";
         $curr_dir = getcwd();
         $dl_dir = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
-#        echo "cd $dl_dir</br>";
         exec("cd $dl_dir");
-#        echo "git pull origin master</br>";
         exec("git pull origin master");
-#        echo "cd $curr_dir</br>";
         exec("cd $curr_dir");
         return "Called func update_cco";
     }
