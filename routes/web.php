@@ -21,7 +21,7 @@ $router->get('/', function () use ($router) {
 
 $router->get('/{any:.*}', function ($any) use ($router) {
 
-    $DEBUG  = false; # Set to true to enable debugging messages
+    $DEBUG  = true; # Set to true to enable debugging messages
     $output = "NOTHING";
     $ret    = 0;
 
@@ -30,33 +30,47 @@ $router->get('/{any:.*}', function ($any) use ($router) {
     }
 
     list($abbreviation, $search_term) = explode('/', $any, 2);
+#    $search_term = $any;
 
     if ($DEBUG !== false) {
         echo "KH DEBUG: abbreviation -----------> $abbreviation</br>";
         echo "KH DEBUG: search_term ------------> $search_term</br>";
     }
 
+    // Case where extension is there IE
+    // www.ontologyrepository.com/CommonCoreOntologies/Mid/AgentOntology.ttl
     if(strpos($search_term, '.') !== false) {
-        // explodable
         list($search_term_final, $file_extension) = explode('.', $search_term);
 
         if ($DEBUG !== false) {
             echo "KH DEBUG: search_term_final ------> $search_term_final</br>";
             echo "KH DEBUG: file_extension ---------> $file_extension</br>";
-        echo "KH DEBUG: Triggered file extension search</br>";
+            echo "KH DEBUG: Triggered file extension search</br>";
         }
 
-        $ret = $router->app->search_firstline_extension($search_term_final, $output);
-        if ($ret !== 1) {
-            $ret = $router->app->search_whole_file_extension($search_term_final, $output);
+        // Do not honor non-ttl extension searches
+        if ($file_extension === 'ttl') {
+            // Check first line in the file
+            $ret = $router->app->search_firstline_extension($search_term_final,
+                                                            $output);
+            if ($ret !== 1) {
+                // Check all files/all contents if not found in any first-line
+                // NOTE: Talk to Bob about doing full file search...?
+                $ret = $router->app->search_whole_file_extension(
+                                                             $search_term_final,
+                                                             $output);
+            }
         }
-    } else {
-        // not explodable
+    } else { // No file extension case
         if ($DEBUG !== false) {
             echo "KH DEBUG: Triggered normal search</br>";
         }
+        // Check first line in the file
         $ret = $router->app->search_firstline($search_term, $output);
+
         if ($ret !== 1) {
+            // Check all files/all contents if not found in any first-line
+            // NOTE: Talk to Bob about doing full file search...?
             $ret = $router->app->search_whole_file($search_term, $output);
         }
     }
