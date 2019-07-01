@@ -21,7 +21,7 @@ $router->get('/', function () use ($router) {
 
 $router->get('/{any:.*}', function ($any) use ($router) {
 
-    $DEBUG  = true; # Set to true to enable debugging messages
+    $DEBUG  = false; # Set to true to enable debugging messages
     $output = "NOTHING";
     $ret    = 0;
 
@@ -29,12 +29,19 @@ $router->get('/{any:.*}', function ($any) use ($router) {
         echo "KH DEBUG: Route is ---------------> " . $any . "</br>";
     }
 
+    if ($any === 'Visual') {
+        if ($DEBUG !== false) {
+            echo "KH: GOTO VISUAL</br>";
+        }
+        return $router->app->visual_map();
+    }
+
     list($abbreviation, $search_term) = explode('/', $any, 2);
 #    $search_term = $any;
 
     if ($DEBUG !== false) {
-        echo "KH DEBUG: abbreviation -----------> $abbreviation</br>";
-        echo "KH DEBUG: search_term ------------> $search_term</br>";
+            echo "KH DEBUG: abbreviation -----------> $abbreviation</br>";
+            echo "KH DEBUG: search_term ------------> $search_term</br>";
     }
 
     // Case where extension is there IE

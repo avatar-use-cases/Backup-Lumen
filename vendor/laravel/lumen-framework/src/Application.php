@@ -142,6 +142,12 @@ class Application extends Container
 #        return 'Lumen (5.8.4) (Laravel Components 5.8.*)';
     }
 
+    public function visual_map()
+    {
+        $output = "<html><HTTP/1.0 404 Feature Unavailable>ERROR: VISUAL MAP FEATURE COMING SOON!</br></html>";
+        return "KH: DISPLAY VISUAL MAP</br>";
+    }
+
     public function search_firstline($requested_val, &$output)
     {
 //        $DEBUG = true;
@@ -176,12 +182,16 @@ class Application extends Container
                     }
                     if (strpos($line, $requested_val) !== false) {
                         if ($DEBUG !== false) {
-                            echo "Found a match to \"$requested_val\" in this line:</br>";
-                            echo "START: line ----> $line  ... END";
+                            $dbg_msg = "Found a match to";
+                            $dbg_msg .= " \"$requested_val\"in this ";
+                            $dbg_msg .= "line:</br>START: line ----> ";
+                            $dbg_msg .= "$line  ... END";
+                            echo "$dbg_msg";
                         }
                         $whole_file = file_get_contents($curr_file);
                         $output = "<html><div class=\"container\"><pre>";
-                        $output .= "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">";
+                        $output .= "<meta http-equiv=\"content-type\" ";
+                        $output .= "content=\"text/html; charset=UTF-8\">";
                         $whole_file = str_replace("<", "&lt", $whole_file, $i);
                         $whole_file = str_replace(">", "&gt", $whole_file, $i);
                         $output .= $whole_file;
@@ -206,7 +216,9 @@ class Application extends Container
 
         closedir($handle);
 
-        $output = "<html><HTTP/1.0 404 Not Found>ERROR: CCO \"$requested_val\" Not Found</br></html>";
+        $output = "<html><HTTP/1.0 404 Not Found>ERROR: ";
+        $output .= "CCO \"$requested_val\" Not Found</br></html>";
+
         if ( $DEBUG !== false) {
             echo "LEAVE: search_firstline, FAIL</br>";
         }
@@ -249,14 +261,20 @@ class Application extends Container
                         }
                         if (strpos($line, $requested_val) !== false) {
                             if ($DEBUG !== false) {
-                                echo "Found a match to \"$requested_val\" in this line:</br>";
-                                echo "START: line ----> $line  ... END";
+                                $dbg_msg = "Found a match to";
+                                $dbg_msg .= " \"$requested_val\"in this ";
+                                $dbg_msg .= "line:</br>START: line ----> ";
+                                $dbg_msg .= "$line  ... END";
+                                echo "$dbg_msg";
                             }
                             $whole_file = file_get_contents($curr_file);
                             $output = "<html><div class=\"container\"><pre>";
-                            $output .= "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">";
-                            $whole_file = str_replace("<", "&lt", $whole_file, $i);
-                            $whole_file = str_replace(">", "&gt", $whole_file, $i);
+                            $output .= "<meta http-equiv=\"content-type\" ";
+                            $output .= "content=\"text/html; charset=UTF-8\">";
+                            $whole_file = str_replace("<", "&lt", $whole_file,
+                                                      $i);
+                            $whole_file = str_replace(">", "&gt", $whole_file,
+                                                      $i);
                             $output .= $whole_file;
                             $output .= "</meta>";
                             $output .= "</pre></div></html>";
@@ -279,7 +297,8 @@ class Application extends Container
 
         closedir($handle);
 
-        $output = "<html><HTTP/1.0 404 Not Found>ERROR: CCO \"$requested_val\" Not Found</br></html>";
+        $output = "<html><HTTP/1.0 404 Not Found>ERROR: CCO ";
+        $output .= "\"$requested_val\" Not Found</br></html>";
         if ( $DEBUG !== false) {
             echo "LEAVE: search_whole_file, FAIL</br>";
         }
@@ -318,7 +337,9 @@ class Application extends Container
                         $whole_file = str_replace(">", "&gt", $whole_file, $i);
                         $output = $whole_file;
                         if ( $DEBUG !== false) {
-                            echo "LEAVE: search_firstline_extension, SUCCESS</br>";
+                            $dbg_msg = "LEAVE: search_firstline_extension, ";
+                            $dbg_msg .= "SUCCESS</br>";
+                            echo "$dbg_msg";
                         }
                         return 1;
                     }
@@ -335,7 +356,9 @@ class Application extends Container
 
         closedir($handle);
 
-        $output = "<html><HTTP/1.0 404 Not Found>ERROR: CCO \"$requested_val\" Not Found</br></html>";
+        $output = "<html><HTTP/1.0 404 Not Found>ERROR: CCO ";
+        $output .= "\"$requested_val\" Not Found</br></html>";
+
         if ( $DEBUG !== false) {
             echo "LEAVE: search_firstline_extension, FAIL</br>";
         }
@@ -370,11 +393,15 @@ class Application extends Container
                         $line = fgets($fileStream);
                         if (strpos($line, $requested_val) !== false) {
                             $whole_file = file_get_contents($curr_file);
-                            $whole_file = str_replace("<", "&lt", $whole_file, $i);
-                            $whole_file = str_replace(">", "&gt", $whole_file, $i);
+                            $whole_file = str_replace("<", "&lt", $whole_file,
+                                                      $i);
+                            $whole_file = str_replace(">", "&gt", $whole_file,
+                                                      $i);
                             $output = $whole_file;
                             if ( $DEBUG !== false) {
-                                echo "LEAVE: search_whole_file_extension, SUCCESS</br>";
+                                $dbg_msg = "LEAVE: search_firstline_extension,";
+                                $dbg_msg .= " SUCCESS</br>";
+                                echo "$dbg_msg";
                             }
                             return 1;
                         }
@@ -393,7 +420,9 @@ class Application extends Container
 
         closedir($handle);
 
-        $output = "<html><HTTP/1.0 404 Not Found>ERROR: CCO \"$requested_val\" Not Found</br></html>";
+        $output = "<html><HTTP/1.0 404 Not Found>ERROR: CCO ";
+        $output .= "\"$requested_val\" Not Found</br></html>";
+
         if ( $DEBUG !== false) {
             echo "LEAVE: search_whole_file_extension, FAIL</br>";
         }
