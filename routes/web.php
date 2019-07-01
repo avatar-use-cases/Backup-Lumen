@@ -67,6 +67,10 @@ $router->get('/{any:.*}', function ($any) use ($router) {
                                                              $search_term_final,
                                                              $output);
             }
+        } else {
+            $output = "<html><HTTP/1.0 404 Not Found>ERROR: CCO ";
+            $output .= "\".$file_extension\" is not a valid file extension";
+            $output .= ", try .ttl</br></html>";
         }
     } else { // No file extension case
         if ($DEBUG !== false) {
