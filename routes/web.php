@@ -36,6 +36,20 @@ $router->get('/{any:.*}', function ($any) use ($router) {
         return $router->app->visual_map();
     }
 
+    // break anything following the home URL into substrings to be parsed
+    // The "explode()" feature of PHP is great for splitting on all '/'
+    // to get our substrings IE http://www.ontologyrepository.com would not
+    // trigger but http://www.ontologyrepository.com/CommonCoreOntologies/Mid/AgentOntology
+    // will give us the substrings:
+    // 1) CommonCoreOntologies
+    // 2) Mid
+    // 3) AgentOntology
+    // Now since we wish to limit the terms to only two we use the last parameter
+    // to only have final array containing two elements, the first substring and
+    // the remainder IE explode('char', 'string', 'limit');
+    // so now we will get:
+    // 1) CommonCoreOntologies
+    // 2) Mid/AgentOntology
     list($abbreviation, $search_term) = explode('/', $any, 2);
 #    $search_term = $any;
 
@@ -47,6 +61,8 @@ $router->get('/{any:.*}', function ($any) use ($router) {
     // Case where extension is there IE
     // www.ontologyrepository.com/CommonCoreOntologies/Mid/AgentOntology.ttl
     if(strpos($search_term, '.') !== false) {
+        // Similar to the above explode on the address we will now use explode
+        // to check for any .<ext> at the end of the url (IE .ttl)
         list($search_term_final, $file_extension) = explode('.', $search_term);
 
         if ($DEBUG !== false) {
@@ -86,6 +102,43 @@ $router->get('/{any:.*}', function ($any) use ($router) {
         }
     }
 
-    return "$output";
+#    print_r("KH: CHECKING HEADERS!</br>");
+#    print_r( apache_request_headers() );
+#    print_r("</br>KH: CHECKING HEADERS DONE!</br>");
 
+    $accept_header = $_SERVER['HTTP_ACCEPT'];
+    list($preferred_type, $other_types) = explode(',', $accept_header, 2);
+
+    if ($DEBUG !== false) {
+            echo "KH DEBUG: Accept Header = " . $accept_header . "</br>";
+            echo "KH DEBUG: preferred_type -----------> $preferred_type</br>";
+            echo "KH DEBUG: other_types ------------> $other_types</br>";
+    }
+
+    if (strpos("text/html", $preferred_type) !== false ||
+        strpos("application/xml", $preferred_type) !== false) {
+        /* Assume this is a browser and return html format */
+        return response($output)
+                    ->withHeaders([
+                    'Content-Type' => "text/html; charset=UTF-8"
+#                    'Content-Type' => "application/x-turtle; charset=UTF-8"
+                ]);
+    } elseif (strpos("application/x-turtle", $preferred_type) !== false ||
+              strpos("text/turtle", $preferred_type) !== false) {
+        /* return turtle */
+        return response($output)
+                    ->withHeaders([
+                    'Content-Type' => "application/x-turtle; charset=UTF-8"
+                ]);
+    } else {
+        /* If the Accept header starts with application/rdf+xml, or if there is
+         * no Accept header, return the rdf/xml version of the file with
+         * appropriate escapes.  */
+        $output = str_replace("<", "&lt", $output, $i);
+        $output = str_replace(">", "&gt", $output, $i);
+        return response($output)
+                    ->withHeaders([
+                    'Content-Type' => "rdf/xml; charset=UTF-8"
+                ]);
+    }
 });
