@@ -167,14 +167,14 @@ $router->get('/{any:.*}', function ($any) use ($router) {
         # RG 2019-12-04 For now just return turtle
         return response($output)
                     ->withHeaders([
-                    'Content-Type' => "application/x-turtle; charset=UTF-8"
+                    'Content-Type' => "application/x-turtle"
                 ]);
     } elseif (strpos("application/x-turtle", $preferred_type) !== false ||
               strpos("text/turtle", $preferred_type) !== false) {
         /* return turtle */
         return response($output)
                     ->withHeaders([
-                    'Content-Type' => "application/x-turtle; charset=UTF-8"
+                    'Content-Type' => "application/x-turtle"
                 ]);
     } else {
         /* If the Accept header starts with application/rdf+xml, or if there is
@@ -185,7 +185,7 @@ $router->get('/{any:.*}', function ($any) use ($router) {
         #$output = str_replace(">", "&gt", $output, $i);
         return response($output)
                     ->withHeaders([
-                    'Content-Type' => "application/x-turtle; charset=UTF-8"
+                    'Content-Type' => "application/x-turtle"
                 ]);
     }
 });
