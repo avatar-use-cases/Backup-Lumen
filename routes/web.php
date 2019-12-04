@@ -164,9 +164,10 @@ $router->get('/{any:.*}', function ($any) use ($router) {
     if (strpos("text/html", $preferred_type) !== false ||
         strpos("application/xml", $preferred_type) !== false) {
         /* Assume this is a browser and return html format */
+        # RG 2019-12-04 For now just return turtle
         return response($output)
                     ->withHeaders([
-                    'Content-Type' => "text/html; charset=UTF-8"
+                    'Content-Type' => "application/x-turtle; charset=UTF-8"
                 ]);
     } elseif (strpos("application/x-turtle", $preferred_type) !== false ||
               strpos("text/turtle", $preferred_type) !== false) {
@@ -179,11 +180,12 @@ $router->get('/{any:.*}', function ($any) use ($router) {
         /* If the Accept header starts with application/rdf+xml, or if there is
          * no Accept header, return the rdf/xml version of the file with
          * appropriate escapes.  */
-        $output = str_replace("<", "&lt", $output, $i);
-        $output = str_replace(">", "&gt", $output, $i);
+        # RG 2019-12-04 For now, just return turtle
+        #$output = str_replace("<", "&lt", $output, $i);
+        #$output = str_replace(">", "&gt", $output, $i);
         return response($output)
                     ->withHeaders([
-                    'Content-Type' => "rdf/xml; charset=UTF-8"
+                    'Content-Type' => "application/x-turtle; charset=UTF-8"
                 ]);
     }
 });
