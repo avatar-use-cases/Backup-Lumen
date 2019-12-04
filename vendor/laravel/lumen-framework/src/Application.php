@@ -148,7 +148,7 @@ class Application extends Container
         return $output."</br>KH: DISPLAY VISUAL MAP</br>";
     }
 
-    public function search_firstline($requested_val, &$output)
+    public function search_firstline($requested_val, $search_folder, &$output)
     {
 //        $DEBUG = true;
         $DEBUG = false;
@@ -156,7 +156,9 @@ class Application extends Container
         # NOTE: requested_val needs to come from the URL request IE:
         #       http://127.0.0.1/cco:agent_in
         $curr_dir    = getcwd();
-        $target_dir  = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
+        #RG 2019-12-04 Made the search folder a variable
+        #$target_dir  = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
+        $target_dir  = "$curr_dir/$search_folder";
         # NOTE: TODO: Add loop to update curr_file, parse all files in directory
         #             avatar-cco-files/
 
@@ -223,7 +225,7 @@ class Application extends Container
         return 0;
     }
 
-    public function search_whole_file($requested_val, &$output)
+    public function search_whole_file($requested_val, $search_folder, &$output)
     {
 //        $DEBUG = true;
         $DEBUG = false;
@@ -231,7 +233,9 @@ class Application extends Container
         # NOTE: requested_val needs to come from the URL request IE:
         #       http://127.0.0.1/cco:agent_in
         $curr_dir    = getcwd();
-        $target_dir  = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
+        #RG 2019-12-04 Made the search folder a variable
+        #$target_dir  = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
+        $target_dir  = "$curr_dir/$search_folder";
         # NOTE: TODO: Add loop to update curr_file, parse all files in directory
         #             avatar-cco-files/
 
@@ -298,7 +302,9 @@ class Application extends Container
         return 0;
     }
 
-    public function search_firstline_extension($requested_val, &$output)
+    public function search_firstline_extension($requested_val,
+                                               $search_folder,
+                                               &$output)
     {
 //        $DEBUG = true;
         $DEBUG = false;
@@ -306,7 +312,9 @@ class Application extends Container
         # NOTE: requested_val needs to come from the URL request IE:
         #       http://127.0.0.1/cco:agent_in
         $curr_dir    = getcwd();
-        $target_dir  = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
+        #RG 2019-12-04 Made the searc folder a variable
+        #$target_dir  = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
+        $target_dir  = "$curr_dir/$search_folder";
         # NOTE: TODO: Add loop to update curr_file, parse all files in directory
         #             avatar-cco-files/
 
@@ -355,7 +363,9 @@ class Application extends Container
         return 0;
     }
 
-    public function search_whole_file_extension($requested_val, &$output)
+    public function search_whole_file_extension($requested_val,
+                                                $search_folder,
+                                                &$output)
     {
 //        $DEBUG = true;
         $DEBUG = false;
@@ -363,7 +373,9 @@ class Application extends Container
         # NOTE: requested_val needs to come from the URL request IE:
         #       http://127.0.0.1/cco:agent_in
         $curr_dir    = getcwd();
-        $target_dir  = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
+        #RG 2019-12-04 Made the search folder a variable
+        #$target_dir  = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
+        $target_dir  = "$curr_dir/$search_folder";
         # NOTE: TODO: Add loop to update curr_file, parse all files in directory
         #             avatar-cco-files/
         if ( $DEBUG !== false) {

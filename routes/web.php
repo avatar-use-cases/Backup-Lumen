@@ -25,6 +25,10 @@ $router->get('/{any:.*}', function ($any) use ($router) {
     $output = "NOTHING";
     $ret    = 0;
 
+    #RG 2019-12-04 Search locations for matching classes
+    $search_folder_cco = "avatar_cco_files/CommonCoreOntologies";
+    $search_folder_imports = "$search_folder_cco/imports";
+
     if($DEBUG !== false) {
         echo "KH DEBUG: Route is ---------------> " . $any . "</br>";
     }
@@ -73,14 +77,30 @@ $router->get('/{any:.*}', function ($any) use ($router) {
 
         // Do not honor non-ttl extension searches
         if ($file_extension === 'ttl') {
+            #RG 2019-12-04 Search imports first since it will be more unique
             // Check first line in the file
-            $ret = $router->app->search_firstline_extension($search_term_final,
+            $ret = $router->app->search_firstline_extension(
+                                                         $search_term_final,
+                                                         $search_folder_imports,
+                                                         $output);
+            if ($ret != 1) {
+               $ret = $router->app->search_firstline_extension(
+                                                            $search_term_final,
+                                                            $search_folder_cco,
                                                             $output);
+            }
             if ($ret !== 1) {
                 // Check all files/all contents if not found in any first-line
                 // NOTE: Talk to Bob about doing full file search...?
                 $ret = $router->app->search_whole_file_extension(
+                                                         $search_term_final,
+                                                         $search_folder_imports,
+                                                         $output);
+            }
+            if ($ret !== 1) {
+                $ret = $router->app->search_whole_file_extension(
                                                              $search_term_final,
+                                                             $search_folder_cco,
                                                              $output);
             }
         } else {
@@ -92,13 +112,28 @@ $router->get('/{any:.*}', function ($any) use ($router) {
         if ($DEBUG !== false) {
             echo "KH DEBUG: Triggered normal search</br>";
         }
+        #RG 2019-12-04 Search imports first since it will be more unique
         // Check first line in the file
-        $ret = $router->app->search_firstline($search_term, $output);
+        $ret = $router->app->search_firstline($search_term,
+                                              $search_folder_imports,
+                                              $output);
 
+        if ($ret !== 1) {
+            $ret = $router->app->search_firstline($search_term,
+                                                  $search_folder_cco,
+                                                  $output);
+        }
         if ($ret !== 1) {
             // Check all files/all contents if not found in any first-line
             // NOTE: Talk to Bob about doing full file search...?
-            $ret = $router->app->search_whole_file($search_term, $output);
+            $ret = $router->app->search_whole_file($search_term,
+                                                   $search_folder_imports,
+                                                   $output);
+        }
+        if ($ret !== 1) {
+            $ret = $router->app->search_whole_file($search_term,
+                                                   $search_folder_cco,
+                                                   $output);
         }
     }
 
