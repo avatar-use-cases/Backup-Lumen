@@ -106,8 +106,19 @@ $router->get('/{any:.*}', function ($any) use ($router) {
 #    print_r( apache_request_headers() );
 #    print_r("</br>KH: CHECKING HEADERS DONE!</br>");
 
+# RG 2019-12-03 - fixed bug: if only one member in accept header, throws error
+
     $accept_header = $_SERVER['HTTP_ACCEPT'];
-    list($preferred_type, $other_types) = explode(',', $accept_header, 2);
+    #list($preferred_type, $other_types) = explode(',', $accept_header, 2);
+    $preferred_type = "application/x-turtle";
+    $other_types = "";
+    $accept_types = explode(',', $accept_header, 2);
+    if (count($accept_types) > 0) {
+        $preferred_type = $accept_types[0];
+        if (count($accept_types) > 1) {
+            $other_types = $accept_types[1];
+        }
+    }
 
     if ($DEBUG !== false) {
             echo "KH DEBUG: Accept Header = " . $accept_header . "</br>";
@@ -121,7 +132,6 @@ $router->get('/{any:.*}', function ($any) use ($router) {
         return response($output)
                     ->withHeaders([
                     'Content-Type' => "text/html; charset=UTF-8"
-#                    'Content-Type' => "application/x-turtle; charset=UTF-8"
                 ]);
     } elseif (strpos("application/x-turtle", $preferred_type) !== false ||
               strpos("text/turtle", $preferred_type) !== false) {

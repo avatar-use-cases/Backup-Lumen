@@ -189,8 +189,10 @@ class Application extends Container
                             echo "$dbg_msg";
                         }
                         $whole_file = file_get_contents($curr_file);
-                        $whole_file = str_replace("<", "&lt;", $whole_file, $i);
-                        $whole_file = str_replace(">", "&gt;", $whole_file, $i);
+
+                        # RG 2019-12-03 - Removed escapes
+                        #$whole_file = str_replace("<", "&lt;", $whole_file, $i);
+                        #$whole_file = str_replace(">", "&gt;", $whole_file, $i);
                         $output = $whole_file;
                         if ( $DEBUG !== false) {
                             echo "LEAVE: search_firstline, SUCCESS</br>";
@@ -263,10 +265,12 @@ class Application extends Container
                                 echo "$dbg_msg";
                             }
                             $whole_file = file_get_contents($curr_file);
-                            $whole_file = str_replace("<", "&lt", $whole_file,
-                                                      $i);
-                            $whole_file = str_replace(">", "&gt", $whole_file,
-                                                      $i);
+
+                            # RG 2019-12-03 - Removed escapes
+                            #$whole_file = str_replace("<", "&lt", $whole_file,
+                            #                          $i);
+                            #$whole_file = str_replace(">", "&gt", $whole_file,
+                            #                          $i);
                             $output = $whole_file;
                             if ( $DEBUG !== false) {
                                 echo "LEAVE: search_whole_file, SUCCESS</br>";
@@ -379,10 +383,12 @@ class Application extends Container
                         $line = fgets($fileStream);
                         if (strpos($line, $requested_val) !== false) {
                             $whole_file = file_get_contents($curr_file);
-                            $whole_file = str_replace("<", "&lt", $whole_file,
-                                                      $i);
-                            $whole_file = str_replace(">", "&gt", $whole_file,
-                                                      $i);
+
+                            # RG 2019-12-03 - Removed escapes
+                            #$whole_file = str_replace("<", "&lt", $whole_file,
+                            #                          $i);
+                            #$whole_file = str_replace(">", "&gt", $whole_file,
+                            #                          $i);
                             $output = $whole_file;
                             if ( $DEBUG !== false) {
                                 $dbg_msg = "LEAVE: search_firstline_extension,";
