@@ -135,6 +135,12 @@ class Application extends Container
     {
         $curr_dir = getcwd();
         $myindex_html="$curr_dir/avatar_webpage/index.html";
+        $dl_dir = "$curr_dir/avatar_cco_files/CommonCoreOntologies"; // this should be /var/www/avatarcco.com/public/avatar_cco_files/CommonCoreOntologies/
+#        shell_exec("cd $dl_dir");
+        chdir($dl_dir);
+        shell_exec("/bin/git pull");
+#        shell_exec("cd $curr_dir");
+        chdir($curr_dir);
 #        $myindex_html="/var/www/html/index.php";
         return file_get_contents($myindex_html);
 #        return 'Kaleb: Lumen (5.8.4) (Laravel Components 5.8.*)';
@@ -433,19 +439,6 @@ class Application extends Container
         return 0;
     }
 
-
-    /* A function to update the downloaded files, call with $this->dlcco
-     * from inside the class
-     */
-    public function update_cco()
-    {
-        $curr_dir = getcwd();
-        $dl_dir = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
-        exec("cd $dl_dir");
-        exec("git pull origin master");
-        exec("cd $curr_dir");
-        return "Called func update_cco";
-    }
 
     /**
      * Determine if the application is currently down for maintenance.

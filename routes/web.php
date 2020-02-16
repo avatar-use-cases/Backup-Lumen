@@ -22,6 +22,7 @@ $router->get('/', function () use ($router) {
 $router->get('/{any:.*}', function ($any) use ($router) {
 
     $DEBUG  = false; # Set to true to enable debugging messages
+#    $DEBUG = true;
     $output = "NOTHING";
     $ret    = 0;
 
@@ -167,7 +168,7 @@ $router->get('/{any:.*}', function ($any) use ($router) {
         # RG 2019-12-04 For now just return turtle
         return response($output)
                     ->withHeaders([
-                    'Content-Type' => "application/x-turtle"
+                    'Content-Type' => "text/html"
                 ]);
     } elseif (strpos("application/x-turtle", $preferred_type) !== false ||
               strpos("text/turtle", $preferred_type) !== false) {
@@ -183,6 +184,8 @@ $router->get('/{any:.*}', function ($any) use ($router) {
         # RG 2019-12-04 For now, just return turtle
         #$output = str_replace("<", "&lt", $output, $i);
         #$output = str_replace(">", "&gt", $output, $i);
+        # KH 2020-01-18 sync up with bob on this given task list itme 1
+        #   See jira Avatar-566
         return response($output)
                     ->withHeaders([
                     'Content-Type' => "application/x-turtle"
