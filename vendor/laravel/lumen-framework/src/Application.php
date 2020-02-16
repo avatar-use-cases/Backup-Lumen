@@ -135,6 +135,12 @@ class Application extends Container
     {
         $curr_dir = getcwd();
         $myindex_html="$curr_dir/avatar_webpage/index.html";
+        $dl_dir = "$curr_dir/avatar_cco_files/CommonCoreOntologies"; // this should be /var/www/avatarcco.com/public/avatar_cco_files/CommonCoreOntologies/
+#        shell_exec("cd $dl_dir");
+        chdir($dl_dir);
+        shell_exec("/bin/git pull");
+#        shell_exec("cd $curr_dir");
+        chdir($curr_dir);
 #        $myindex_html="/var/www/html/index.php";
         return file_get_contents($myindex_html);
 #        return 'Kaleb: Lumen (5.8.4) (Laravel Components 5.8.*)';
@@ -148,7 +154,7 @@ class Application extends Container
         return $output."</br>KH: DISPLAY VISUAL MAP</br>";
     }
 
-    public function search_firstline($requested_val, &$output)
+    public function search_firstline($requested_val, $search_folder, &$output)
     {
 //        $DEBUG = true;
         $DEBUG = false;
@@ -156,7 +162,9 @@ class Application extends Container
         # NOTE: requested_val needs to come from the URL request IE:
         #       http://127.0.0.1/cco:agent_in
         $curr_dir    = getcwd();
-        $target_dir  = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
+        #RG 2019-12-04 Made the search folder a variable
+        #$target_dir  = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
+        $target_dir  = "$curr_dir/$search_folder";
         # NOTE: TODO: Add loop to update curr_file, parse all files in directory
         #             avatar-cco-files/
 
@@ -189,8 +197,10 @@ class Application extends Container
                             echo "$dbg_msg";
                         }
                         $whole_file = file_get_contents($curr_file);
-                        $whole_file = str_replace("<", "&lt;", $whole_file, $i);
-                        $whole_file = str_replace(">", "&gt;", $whole_file, $i);
+
+                        # RG 2019-12-03 - Removed escapes
+                        #$whole_file = str_replace("<", "&lt;", $whole_file, $i);
+                        #$whole_file = str_replace(">", "&gt;", $whole_file, $i);
                         $output = $whole_file;
                         if ( $DEBUG !== false) {
                             echo "LEAVE: search_firstline, SUCCESS</br>";
@@ -221,7 +231,7 @@ class Application extends Container
         return 0;
     }
 
-    public function search_whole_file($requested_val, &$output)
+    public function search_whole_file($requested_val, $search_folder, &$output)
     {
 //        $DEBUG = true;
         $DEBUG = false;
@@ -229,7 +239,9 @@ class Application extends Container
         # NOTE: requested_val needs to come from the URL request IE:
         #       http://127.0.0.1/cco:agent_in
         $curr_dir    = getcwd();
-        $target_dir  = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
+        #RG 2019-12-04 Made the search folder a variable
+        #$target_dir  = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
+        $target_dir  = "$curr_dir/$search_folder";
         # NOTE: TODO: Add loop to update curr_file, parse all files in directory
         #             avatar-cco-files/
 
@@ -263,10 +275,12 @@ class Application extends Container
                                 echo "$dbg_msg";
                             }
                             $whole_file = file_get_contents($curr_file);
-                            $whole_file = str_replace("<", "&lt", $whole_file,
-                                                      $i);
-                            $whole_file = str_replace(">", "&gt", $whole_file,
-                                                      $i);
+
+                            # RG 2019-12-03 - Removed escapes
+                            #$whole_file = str_replace("<", "&lt", $whole_file,
+                            #                          $i);
+                            #$whole_file = str_replace(">", "&gt", $whole_file,
+                            #                          $i);
                             $output = $whole_file;
                             if ( $DEBUG !== false) {
                                 echo "LEAVE: search_whole_file, SUCCESS</br>";
@@ -294,7 +308,9 @@ class Application extends Container
         return 0;
     }
 
-    public function search_firstline_extension($requested_val, &$output)
+    public function search_firstline_extension($requested_val,
+                                               $search_folder,
+                                               &$output)
     {
 //        $DEBUG = true;
         $DEBUG = false;
@@ -302,7 +318,9 @@ class Application extends Container
         # NOTE: requested_val needs to come from the URL request IE:
         #       http://127.0.0.1/cco:agent_in
         $curr_dir    = getcwd();
-        $target_dir  = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
+        #RG 2019-12-04 Made the searc folder a variable
+        #$target_dir  = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
+        $target_dir  = "$curr_dir/$search_folder";
         # NOTE: TODO: Add loop to update curr_file, parse all files in directory
         #             avatar-cco-files/
 
@@ -351,7 +369,9 @@ class Application extends Container
         return 0;
     }
 
-    public function search_whole_file_extension($requested_val, &$output)
+    public function search_whole_file_extension($requested_val,
+                                                $search_folder,
+                                                &$output)
     {
 //        $DEBUG = true;
         $DEBUG = false;
@@ -359,7 +379,9 @@ class Application extends Container
         # NOTE: requested_val needs to come from the URL request IE:
         #       http://127.0.0.1/cco:agent_in
         $curr_dir    = getcwd();
-        $target_dir  = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
+        #RG 2019-12-04 Made the search folder a variable
+        #$target_dir  = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
+        $target_dir  = "$curr_dir/$search_folder";
         # NOTE: TODO: Add loop to update curr_file, parse all files in directory
         #             avatar-cco-files/
         if ( $DEBUG !== false) {
@@ -379,10 +401,12 @@ class Application extends Container
                         $line = fgets($fileStream);
                         if (strpos($line, $requested_val) !== false) {
                             $whole_file = file_get_contents($curr_file);
-                            $whole_file = str_replace("<", "&lt", $whole_file,
-                                                      $i);
-                            $whole_file = str_replace(">", "&gt", $whole_file,
-                                                      $i);
+
+                            # RG 2019-12-03 - Removed escapes
+                            #$whole_file = str_replace("<", "&lt", $whole_file,
+                            #                          $i);
+                            #$whole_file = str_replace(">", "&gt", $whole_file,
+                            #                          $i);
                             $output = $whole_file;
                             if ( $DEBUG !== false) {
                                 $dbg_msg = "LEAVE: search_firstline_extension,";
@@ -415,19 +439,6 @@ class Application extends Container
         return 0;
     }
 
-
-    /* A function to update the downloaded files, call with $this->dlcco
-     * from inside the class
-     */
-    public function update_cco()
-    {
-        $curr_dir = getcwd();
-        $dl_dir = "$curr_dir/avatar_cco_files/CommonCoreOntologies";
-        exec("cd $dl_dir");
-        exec("git pull origin master");
-        exec("cd $curr_dir");
-        return "Called func update_cco";
-    }
 
     /**
      * Determine if the application is currently down for maintenance.

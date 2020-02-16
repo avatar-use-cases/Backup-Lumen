@@ -22,8 +22,13 @@ $router->get('/', function () use ($router) {
 $router->get('/{any:.*}', function ($any) use ($router) {
 
     $DEBUG  = false; # Set to true to enable debugging messages
+#    $DEBUG = true;
     $output = "NOTHING";
     $ret    = 0;
+
+    #RG 2019-12-04 Search locations for matching classes
+    $search_folder_cco = "avatar_cco_files/CommonCoreOntologies";
+    $search_folder_imports = "$search_folder_cco/imports";
 
     if($DEBUG !== false) {
         echo "KH DEBUG: Route is ---------------> " . $any . "</br>";
@@ -73,14 +78,30 @@ $router->get('/{any:.*}', function ($any) use ($router) {
 
         // Do not honor non-ttl extension searches
         if ($file_extension === 'ttl') {
+            #RG 2019-12-04 Search imports first since it will be more unique
             // Check first line in the file
-            $ret = $router->app->search_firstline_extension($search_term_final,
+            $ret = $router->app->search_firstline_extension(
+                                                         $search_term_final,
+                                                         $search_folder_imports,
+                                                         $output);
+            if ($ret != 1) {
+               $ret = $router->app->search_firstline_extension(
+                                                            $search_term_final,
+                                                            $search_folder_cco,
                                                             $output);
+            }
             if ($ret !== 1) {
                 // Check all files/all contents if not found in any first-line
                 // NOTE: Talk to Bob about doing full file search...?
                 $ret = $router->app->search_whole_file_extension(
+                                                         $search_term_final,
+                                                         $search_folder_imports,
+                                                         $output);
+            }
+            if ($ret !== 1) {
+                $ret = $router->app->search_whole_file_extension(
                                                              $search_term_final,
+                                                             $search_folder_cco,
                                                              $output);
             }
         } else {
@@ -92,13 +113,28 @@ $router->get('/{any:.*}', function ($any) use ($router) {
         if ($DEBUG !== false) {
             echo "KH DEBUG: Triggered normal search</br>";
         }
+        #RG 2019-12-04 Search imports first since it will be more unique
         // Check first line in the file
-        $ret = $router->app->search_firstline($search_term, $output);
+        $ret = $router->app->search_firstline($search_term,
+                                              $search_folder_imports,
+                                              $output);
 
+        if ($ret !== 1) {
+            $ret = $router->app->search_firstline($search_term,
+                                                  $search_folder_cco,
+                                                  $output);
+        }
         if ($ret !== 1) {
             // Check all files/all contents if not found in any first-line
             // NOTE: Talk to Bob about doing full file search...?
-            $ret = $router->app->search_whole_file($search_term, $output);
+            $ret = $router->app->search_whole_file($search_term,
+                                                   $search_folder_imports,
+                                                   $output);
+        }
+        if ($ret !== 1) {
+            $ret = $router->app->search_whole_file($search_term,
+                                                   $search_folder_cco,
+                                                   $output);
         }
     }
 
@@ -106,8 +142,19 @@ $router->get('/{any:.*}', function ($any) use ($router) {
 #    print_r( apache_request_headers() );
 #    print_r("</br>KH: CHECKING HEADERS DONE!</br>");
 
+# RG 2019-12-03 - fixed bug: if only one member in accept header, throws error
+
     $accept_header = $_SERVER['HTTP_ACCEPT'];
-    list($preferred_type, $other_types) = explode(',', $accept_header, 2);
+    #list($preferred_type, $other_types) = explode(',', $accept_header, 2);
+    $preferred_type = "application/x-turtle";
+    $other_types = "";
+    $accept_types = explode(',', $accept_header, 2);
+    if (count($accept_types) > 0) {
+        $preferred_type = $accept_types[0];
+        if (count($accept_types) > 1) {
+            $other_types = $accept_types[1];
+        }
+    }
 
     if ($DEBUG !== false) {
             echo "KH DEBUG: Accept Header = " . $accept_header . "</br>";
@@ -118,27 +165,30 @@ $router->get('/{any:.*}', function ($any) use ($router) {
     if (strpos("text/html", $preferred_type) !== false ||
         strpos("application/xml", $preferred_type) !== false) {
         /* Assume this is a browser and return html format */
+        # RG 2019-12-04 For now just return turtle
         return response($output)
                     ->withHeaders([
-                    'Content-Type' => "text/html; charset=UTF-8"
-#                    'Content-Type' => "application/x-turtle; charset=UTF-8"
+                    'Content-Type' => "text/html"
                 ]);
     } elseif (strpos("application/x-turtle", $preferred_type) !== false ||
               strpos("text/turtle", $preferred_type) !== false) {
         /* return turtle */
         return response($output)
                     ->withHeaders([
-                    'Content-Type' => "application/x-turtle; charset=UTF-8"
+                    'Content-Type' => "application/x-turtle"
                 ]);
     } else {
         /* If the Accept header starts with application/rdf+xml, or if there is
          * no Accept header, return the rdf/xml version of the file with
          * appropriate escapes.  */
-        $output = str_replace("<", "&lt", $output, $i);
-        $output = str_replace(">", "&gt", $output, $i);
+        # RG 2019-12-04 For now, just return turtle
+        #$output = str_replace("<", "&lt", $output, $i);
+        #$output = str_replace(">", "&gt", $output, $i);
+        # KH 2020-01-18 sync up with bob on this given task list itme 1
+        #   See jira Avatar-566
         return response($output)
                     ->withHeaders([
-                    'Content-Type' => "rdf/xml; charset=UTF-8"
+                    'Content-Type' => "application/x-turtle"
                 ]);
     }
 });
