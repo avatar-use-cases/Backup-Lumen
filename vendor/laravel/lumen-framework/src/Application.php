@@ -205,6 +205,8 @@ class Application extends Container
                         if ( $DEBUG !== false) {
                             echo "LEAVE: search_firstline, SUCCESS</br>";
                         }
+                        fclose($fileStream);
+                        closedir($handle);
                         return 1;
                     }
                     fclose($fileStream);
@@ -213,13 +215,12 @@ class Application extends Container
                     if ( $DEBUG !== false) {
                         echo "LEAVE: search_firstline, FAIL</br>";
                     }
+                    closedir($handle);
                     return 0;
                 } /* end if fileStream sanity check */
             } /* end while second search file loop */
 
         } /* end if openDir sanity check */
-
-        closedir($handle);
 
         $output = "<HTTP/1.0 404 Not Found>ERROR: ";
         $output .= "CCO \"$requested_val\" Not Found</br>";
@@ -285,6 +286,8 @@ class Application extends Container
                             if ( $DEBUG !== false) {
                                 echo "LEAVE: search_whole_file, SUCCESS</br>";
                             }
+                            fclose($fileStream);
+                            closedir($handle);
                             return 1;
                         }
                     } /* end while !feof(fileStream) */
@@ -294,12 +297,11 @@ class Application extends Container
                     if ( $DEBUG !== false) {
                         echo "LEAVE: search_whole_file, FAIL</br>";
                     }
+                    closedir($handle);
                     return 0;
                 } /* end if fileStream sanity check */
             } /* end while second search file loop */
         } /* end if openDir sanity check */
-
-        closedir($handle);
 
         $output = "\"$requested_val\" Not Found</br>";
         if ( $DEBUG !== false) {
@@ -346,6 +348,8 @@ class Application extends Container
                             $dbg_msg .= "SUCCESS</br>";
                             echo "$dbg_msg";
                         }
+                        fclose($fileStream);
+                        closedir($handle);
                         return 1;
                     }
                     fclose($fileStream);
@@ -354,12 +358,11 @@ class Application extends Container
                     if ( $DEBUG !== false) {
                         echo "LEAVE: search_firstline_extension, FAIL</br>";
                     }
+                    closedir($handle);
                     return 0;
                 } /* end if fileStream sanity check */
             } /* end while second search file loop */
         } /* end if openDir sanity check */
-
-        closedir($handle);
 
         $output = "\"$requested_val\" Not Found</br>";
 
@@ -413,6 +416,8 @@ class Application extends Container
                                 $dbg_msg .= " SUCCESS</br>";
                                 echo "$dbg_msg";
                             }
+                            fclose($fileStream);
+                            closedir($handle);
                             return 1;
                         }
                     } /* end while !feof(fileStream) */
@@ -422,13 +427,12 @@ class Application extends Container
                     if ( $DEBUG !== false) {
                         echo "LEAVE: search_whole_file_extension, FAIL</br>";
                     }
+                    closedir($handle);
                     return 0;
                 } /* end if fileStream sanity check */
             } /* end while second search file loop */
 
         } /* end if openDir sanity check */
-
-        closedir($handle);
 
         $output = "<HTTP/1.0 404 Not Found>ERROR: CCO ";
         $output .= "\"$requested_val\" Not Found</br>";
