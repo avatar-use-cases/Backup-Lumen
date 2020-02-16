@@ -109,13 +109,17 @@ $router->get('/{any:.*}', function ($any) use ($router) {
         # KH: 16 Jan 2020 - Add solution for returning rdf format
         // if someone enters .rdf return rdf format
                 // make a new directory to store the rdf conversion
-                shell_exec("mkdir $search_folder_rdf");
+                if (!file_exists("$search_folder_rdf")) {
+                    shell_exec("mkdir $search_folder_rdf");
+                }
                 // run the conversion, write out conversion to new directory
                 // This command converts from .ttl to .rdf:
                 $DEFAULT_RIOT="apache-jena-3.14.0/bin/riot";
                 list($junk_throwaway, $file_w_ext) = explode('/', $search_term, 2);
                 list($fileName, $junk_throwaway) = explode('.', $file_w_ext, 2);
-                shell_exec("$DEFAULT_RIOT --output=rdfxml $search_folder_cco/$fileName.ttl > $search_folder_rdf/$fileName.rdf");
+                if (!file_exists("$search_folder_rdf/$fileName.rdf")) {
+                    shell_exec("$DEFAULT_RIOT --output=rdfxml $search_folder_cco/$fileName.ttl > $search_folder_rdf/$fileName.rdf");
+                }
                 // run search_first_line_extension on the rdf output directory.
                 $ret = $router->app->search_firstline_extension(
                                                             $search_term_final,
