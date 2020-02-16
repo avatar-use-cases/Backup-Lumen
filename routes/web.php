@@ -29,6 +29,7 @@ $router->get('/{any:.*}', function ($any) use ($router) {
     #RG 2019-12-04 Search locations for matching classes
     $search_folder_cco = "avatar_cco_files/CommonCoreOntologies";
     $search_folder_imports = "$search_folder_cco/imports";
+    $search_folder_rdf = "$search_folder_cco/rdf"; #KH: Added 16 Jan 2020
 
     if($DEBUG !== false) {
         echo "KH DEBUG: Route is ---------------> " . $any . "</br>";
@@ -104,6 +105,37 @@ $router->get('/{any:.*}', function ($any) use ($router) {
                                                              $search_folder_cco,
                                                              $output);
             }
+        } else if ($file_extension === 'rdf') {
+        # KH: 16 Jan 2020 - Add solution for returning rdf format
+        // if someone enters .rdf return rdf format
+                // make a new directory to store the rdf conversion
+                shell_exec("mkdir $search_folder_rdf");
+                // run the conversion, write out conversion to new directory
+                // This command converts from .ttl to .rdf:
+                $DEFAULT_RIOT="apache-jena-3.14.0/bin/riot";
+                list($junk_throwaway, $file_w_ext) = explode('/', $search_term, 2);
+                echo "KH: junk = $junk_throwaway</br>";
+                echo "KH: file_w_ext = $file_w_ext</br>";
+                list($fileName, $junk_throwaway) = explode('.', $file_w_ext, 2);
+                echo "KH: junk = $junk_throwaway</br>";
+                echo "KH: fileName = $fileName</br>";
+                echo "KH: executing command: $DEFAULT_RIOT --output=rdfxml $search_folder_cco/$fileName.ttl > $search_folder_rdf/$fileName.rdf</br>";
+                shell_exec("$DEFAULT_RIOT --output=rdfxml $search_folder_cco/$fileName.ttl > $search_folder_rdf/$fileName.rdf");
+                // run search_first_line_extension on the rdf output directory.
+                $ret = $router->app->search_firstline_extension(
+                                                            $search_term_final,
+                                                            $search_folder_rdf,
+                                                            $output);
+                if ($ret !== 1) {
+                    $ret = $router->app->search_whole_file_extension(
+                                                            $search_term_final,
+                                                            $search_folder_rdf,
+                                                            $output);
+                }
+                echo "file_extension = $file_extension</br>";
+                echo "</br>";
+        // end rdf handling
+
         } else {
             $output = "<html><HTTP/1.0 404 Not Found>ERROR: CCO ";
             $output .= "\".$file_extension\" is not a valid file extension";
