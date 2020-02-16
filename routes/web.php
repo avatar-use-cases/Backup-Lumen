@@ -114,12 +114,7 @@ $router->get('/{any:.*}', function ($any) use ($router) {
                 // This command converts from .ttl to .rdf:
                 $DEFAULT_RIOT="apache-jena-3.14.0/bin/riot";
                 list($junk_throwaway, $file_w_ext) = explode('/', $search_term, 2);
-                echo "KH: junk = $junk_throwaway</br>";
-                echo "KH: file_w_ext = $file_w_ext</br>";
                 list($fileName, $junk_throwaway) = explode('.', $file_w_ext, 2);
-                echo "KH: junk = $junk_throwaway</br>";
-                echo "KH: fileName = $fileName</br>";
-                echo "KH: executing command: $DEFAULT_RIOT --output=rdfxml $search_folder_cco/$fileName.ttl > $search_folder_rdf/$fileName.rdf</br>";
                 shell_exec("$DEFAULT_RIOT --output=rdfxml $search_folder_cco/$fileName.ttl > $search_folder_rdf/$fileName.rdf");
                 // run search_first_line_extension on the rdf output directory.
                 $ret = $router->app->search_firstline_extension(
@@ -132,8 +127,6 @@ $router->get('/{any:.*}', function ($any) use ($router) {
                                                             $search_folder_rdf,
                                                             $output);
                 }
-                echo "file_extension = $file_extension</br>";
-                echo "</br>";
         // end rdf handling
 
         } else {
